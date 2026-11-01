@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Discord Compressor",
+  "version": "0.1.0",
+  "description": "Compresses attachments over 20 MB before Discord uploads them.",
+  "minimum_chrome_version": "111",
+  "content_scripts": [
+    {
+      "matches": ["*://*.discord.com/*"],
+      "js": ["bridge.js"],
+      "run_at": "document_start",
+      "world": "ISOLATED"
+    },
+    {
+      "matches": ["*://*.discord.com/*"],
+      "js": ["page.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "vendor/ffmpeg/814.ffmpeg.js",
+        "vendor/ffmpeg/ffmpeg-core.js",
+        "vendor/ffmpeg/ffmpeg-core.wasm"
+      ],
+      "matches": ["*://*.discord.com/*"]
+    }
+  ]
+}
