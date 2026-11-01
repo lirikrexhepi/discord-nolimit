@@ -1152,14 +1152,17 @@
     if (jobs.length) return;
     showBar();
     bar.dataset.state = "done";
+    const origMB = (batchJobs.reduce((sum, job) => sum + job.file.size, 0) / 1048576).toFixed(1);
+    const finalMB = (batchJobs.reduce((sum, job) => sum + (job.outSize || job.file.size), 0) / 1048576).toFixed(1);
+    const sizeSuffix = " (" + origMB + " MB -> " + finalMB + " MB)";
     let text;
     if (batchJobs.length === 1 && batchJobs[0].split) {
-      text = "Split into 2 parts and attached";
+      text = "Split into 2 parts and attached" + sizeSuffix;
     } else if (batchJobs.length === 1) {
       const kind = batchJobs[0].kind;
-      text = `${kind === "video" ? "Video" : kind === "image" ? "Image" : "File"} compressed and attached`;
+      text = (kind === "video" ? "Video" : kind === "image" ? "Image" : "File") + " compressed and attached" + sizeSuffix;
     } else {
-      text = `${batchJobs.length} files compressed and attached`;
+      text = batchJobs.length + " files compressed and attached" + sizeSuffix;
     }
     labelEl.textContent = text;
     bar.setAttribute("aria-label", text);
@@ -1428,6 +1431,10 @@
       const job = batchJobs.find((item) => item.file === file);
       if (job && results.has(job)) output.push(...results.get(job));
       else output.push(file);
+    }
+    for (const job of batchJobs) {
+      const res = results.get(job);
+      job.outSize = res ? res.reduce((sum, f) => sum + (f.size || 0), 0) : job.file.size;
     }
     const failed = batchJobs.filter((job) => job.failed);
     if (target.channel !== location.pathname) {
