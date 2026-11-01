@@ -565,7 +565,7 @@ async function compressVideoJob(job, batchJobs) {
         plan,
         job.splitRequested,
         (progress) => {
-          job.progress = Math.max(0, Math.min(1, progress));
+          job.progress = Math.max(job.progress || 0, Math.max(0, Math.min(1, progress)));
           renderBar();
         },
       );
