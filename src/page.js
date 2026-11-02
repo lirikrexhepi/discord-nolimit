@@ -495,7 +495,8 @@ function finishBar(batchJobs) {
   const finalMB = (batchJobs.reduce((sum, job) => sum + (job.outSize || job.file.size), 0) / 1048576).toFixed(1);
   const sizeSuffix = " (" + origMB + " MB -> " + finalMB + " MB)";
   let text;
-  if (batchJobs.length === 1 && batchJobs[0].split) {
+  const didSplit = batchJobs.some((job) => (job.outCount || 1) > 1);
+  if (batchJobs.length === 1 && didSplit) {
     text = "Split into 2 parts and attached" + sizeSuffix;
   } else if (batchJobs.length === 1) {
     const kind = batchJobs[0].kind;
@@ -791,6 +792,7 @@ async function runBatch(files, target) {
   for (const job of batchJobs) {
     const res = results.get(job);
     job.outSize = res ? res.reduce((sum, f) => sum + (f.size || 0), 0) : job.file.size;
+    job.outCount = res ? res.length : 1;
   }
   const failed = batchJobs.filter((job) => job.failed);
   if (target.channel !== location.pathname) {
